@@ -1,0 +1,62 @@
+steamcmd:
+  path: "./steamcmd"
+
+steam:
+  username: "your_steam_username"
+  password: "your_steam_password"
+
+server:
+  install_dir: "./dayzserver"
+  executable: "./dayzserver/DayZServer_x64.exe"
+  args: "-config=serverDZ.cfg -port=2302 -profiles=profiles -dologs -adminlog -netlog"
+  restart_delay: 10
+
+mods:
+  workshop_app_id: 221100
+  directory: "./dayzserver/steamapps/workshop/content/221100"
+  links:
+    - "https://steamcommunity.com/sharedfiles/filedetails/?id=1559212036"
+    - "https://steamcommunity.com/sharedfiles/filedetails/?id=1564026768"
+
+rcon:
+  enabled: true
+  host: "127.0.0.1"
+  port: 2305
+  password: "your_battleye_rcon_password"
+  message_command: 'say -1 "{message}"'
+  timeout_seconds: 5
+
+scheduler:
+  timezone: "Asia/Kolkata"
+  restart_times:
+    - "00:00"
+    - "04:00"
+    - "08:00"
+    - "12:00"
+    - "16:00"
+    - "20:00"
+  restart_warnings:
+    - offset_minutes: 60
+      message: "Scheduled restart in 60 minutes."
+    - offset_minutes: 45
+      message: "Scheduled restart in 45 minutes."
+    - offset_minutes: 30
+      message: "Scheduled restart in 30 minutes."
+    - offset_minutes: 15
+      message: "Scheduled restart in 15 minutes."
+    - offset_minutes: 10
+      message: "Scheduled restart in 10 minutes."
+    - offset_minutes: 5
+      message: "Scheduled restart in 5 minutes."
+    - offset_minutes: 3
+      message: "Scheduled restart in 3 minutes."
+    - offset_minutes: 1
+      message: "Scheduled restart in 1 minute."
+  periodic_messages:
+    - interval_minutes: 60
+      first_after_start_minutes: 60
+      message: "Remember to take breaks and keep your gear safe."
+  rcon_startup_delay_seconds: 15
+  rcon_retry_delay_seconds: 5
+  interactive_rcon_console: true
+  shutdown_grace_seconds: 15
