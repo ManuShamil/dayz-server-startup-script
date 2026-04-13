@@ -657,10 +657,19 @@ class DayZServerManager:
 
         retry_delay_seconds = int(self.scheduler_config.get("rcon_retry_delay_seconds", 5))
         while not self._stop_requested:
+            if self._server_process and self._server_process.poll() is not None:
+                print("Server exited before RCON became available")
+                return False
             if self._check_rcon_connection():
                 return True
             print(f"Retrying RCON connection in {retry_delay_seconds} seconds...")
-            time.sleep(retry_delay_seconds)
+            for _ in range(retry_delay_seconds):
+                if self._stop_requested:
+                    return False
+                if self._server_process and self._server_process.poll() is not None:
+                    print("Server exited before RCON became available")
+                    return False
+                time.sleep(1)
 
         return False
 
@@ -825,7 +834,12 @@ class DayZServerManager:
             self._server_process = subprocess.Popen(command)
             rcon_startup_delay = int(self.scheduler_config.get("rcon_startup_delay_seconds", 15))
             if rcon_startup_delay > 0:
-                time.sleep(rcon_startup_delay)
+                for _ in range(rcon_startup_delay):
+                    if self._stop_requested:
+                        break
+                    if self._server_process.poll() is not None:
+                        break
+                    time.sleep(1)
             if self._wait_for_rcon_connection():
                 self._start_rcon_console()
             schedule = self._build_runtime_schedule(self._now())
