@@ -215,6 +215,13 @@ class DayZServerManager:
         return self.steamcmd_dir / executable
 
     @property
+    def steamcmd_extra_args(self) -> list[str]:
+        raw_args = self.config["steamcmd"].get("extra_args", [])
+        if isinstance(raw_args, str):
+            return shlex.split(raw_args, posix=os.name != "nt")
+        return [str(arg) for arg in raw_args]
+
+    @property
     def server_install_dir(self) -> Path:
         return self.resolve_path(self.config["server"]["install_dir"])
 
@@ -413,6 +420,7 @@ class DayZServerManager:
 
         command = [
             str(self.steamcmd_executable),
+            *self.steamcmd_extra_args,
             "+runscript",
             str(script_path),
         ]
