@@ -594,6 +594,9 @@ class DayZServerManager:
     def _now(self) -> datetime:
         return datetime.now(self._scheduler_timezone)
 
+    def _format_datetime(self, value: datetime) -> str:
+        return value.strftime("%Y-%m-%d %I:%M:%S %p %Z")
+
     def _rcon_enabled(self) -> bool:
         return bool(self.rcon_config.get("enabled"))
 
@@ -735,7 +738,7 @@ class DayZServerManager:
     def _build_runtime_schedule(self, server_started_at: datetime) -> RuntimeSchedule:
         next_restart_at = self._next_restart_time(server_started_at)
         if next_restart_at:
-            print(f"Next scheduled restart at {next_restart_at.isoformat()}")
+            print(f"Next scheduled restart at {self._format_datetime(next_restart_at)}")
         return RuntimeSchedule(
             next_restart_at=next_restart_at,
             sent_warning_offsets=set(),
