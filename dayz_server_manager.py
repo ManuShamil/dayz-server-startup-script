@@ -1,6 +1,7 @@
 import argparse
 import os
 import shlex
+import shutil
 import signal
 import socket
 import stat
@@ -336,6 +337,21 @@ class DayZServerManager:
             else:
                 print(f"Warning: unable to parse Workshop id from link: {link}")
         return mod_ids
+
+    def _copy_mod_keys(self, mod_paths: Iterable[Path]) -> None:
+        keys_dir = self.server_install_dir / "keys"
+        keys_dir.mkdir(parents=True, exist_ok=True)
+        for mod_path in mod_paths:
+            # Workshop mods usually store keys in a "keys" or "Keys" folder.
+            for sub_dir_name in ("keys", "Keys"):
+                sub_dir = mod_path / sub_dir_name
+                if sub_dir.is_dir():
+                    for bikey_file in sub_dir.glob("*.bikey"):
+                        try:
+                            shutil.copy2(bikey_file, keys_dir / bikey_file.name)
+                            print(f"Copied key {bikey_file.name} to {keys_dir}")
+                        except Exception as e:
+                            print(f"Failed to copy key {bikey_file.name}: {e}")
 
     def run_steamcmd(
         self,
@@ -826,6 +842,7 @@ class DayZServerManager:
             self._send_rcon_command(command)
 
     def start_and_monitor_server(self, mod_paths: Iterable[Path]) -> None:
+        self._copy_mod_keys(mod_paths)
         restart_delay = int(self.config["server"].get("restart_delay", 10))
         command = self.build_server_command(mod_paths)
 
